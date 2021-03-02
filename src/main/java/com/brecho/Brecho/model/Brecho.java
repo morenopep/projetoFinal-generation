@@ -7,42 +7,22 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Entity
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity @NoArgsConstructor @AllArgsConstructor
 public class Brecho {
 	//Atributos
 	
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-		private Long id;
+	@Id @Getter @GeneratedValue(strategy = GenerationType.IDENTITY)
+		private Long id;	
 	
-	@NotNull @Size(min = 3 , max = 45)
+	@NotNull @Getter @Setter @Size(min = 3 , max = 45)
 		private String nome;
 	
-	@NotNull @Size(min = 3 , max = 45)
+	@NotNull @Getter @Setter @Size(min = 3 , max = 45)
 		private String descricao;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getNome() {
-		return nome;
-	}
-
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
-
-	public String getDescricao() {
-		return descricao;
-	}
-
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
-	}
-	
 	
 }
