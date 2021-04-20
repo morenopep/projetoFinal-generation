@@ -1,3 +1,23 @@
+#navbar {
+  transition: all 0.25s;
+}
+
+#navbar-margem {
+  transition: all 0.25s;
+}
+
+ul {
+  display: block
+}
+
+li {
+  display: inline-block;
+}
+
+.fs-11 {
+  font-size: 11pt;
+}
+
 .hover-item:hover {
   transition: 0.15s;
   transform: scale(1.03);
@@ -25,7 +45,20 @@
   transition: 0.15s;
   transform: scale(1);
   opacity: 1;
+}
+
+.hover-sair:hover {
+  transition: 0.15s;
+  transform: scale(1.05);
+  opacity: .8;
+  color: rgb(218, 30, 30);
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.hover-sair:not(:hover) {
+  transition: 0.15s;
+  transform: scale(1);
+  color: #75A26C;
 }
 
 .input-pesquisar {

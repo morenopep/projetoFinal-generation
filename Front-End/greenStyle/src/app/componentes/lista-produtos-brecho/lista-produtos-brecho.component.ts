@@ -23,6 +23,11 @@ export class ListaProdutosBrechoComponent implements OnInit {
   listaProduto: Produto[]
   listaCategoria: Categoria[]
 
+  key = "disponivel"
+  reverse = true
+
+  paginaAtual:number=1
+
   constructor(
     private produtoService: ProdutoService,
     private categoriaService: CategoriaService,
@@ -47,8 +52,9 @@ export class ListaProdutosBrechoComponent implements OnInit {
     this.setBrecho()
     this.setListaCategoria()
     this.setListaProduto(this.idBrecho)
+    this.paginaAtual=1
   }
-  
+
   setListaCategoria () {
     this.categoriaService.getAllCategoria().subscribe((resp: Categoria[])=> this.listaCategoria = resp)
   }
@@ -57,6 +63,7 @@ export class ListaProdutosBrechoComponent implements OnInit {
     this.produtoService.getByIdBrechoProdutos(id).subscribe((resp: Produto[]) => {
       this.listaProduto = resp
     })
+    this.paginaAtual=1
   }
 
   setListaFiltro(id: number) {
@@ -64,13 +71,14 @@ export class ListaProdutosBrechoComponent implements OnInit {
       this.listaProduto = []
 
       for(let item of resp) {
-        
+
         if(item.brecho.id == this.idBrecho) {
           this.listaProduto.push(item)
         }
 
       }
     })
+    this.paginaAtual=1
   }
 
   setBrecho() {
@@ -88,7 +96,13 @@ export class ListaProdutosBrechoComponent implements OnInit {
   addToCarrinho(produto: Produto)
   {
     this.carrinhoService.addToCarrinho(produto)
-    alert("Item adicionado com sucesso")
+  }
+
+  deslocamento(){
+    window.scroll({
+      top: 300,
+      behavior: 'smooth'
+    })
   }
 
 }

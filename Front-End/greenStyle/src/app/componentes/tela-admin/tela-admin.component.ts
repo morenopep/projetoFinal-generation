@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Brecho } from 'src/app/Models/Brecho';
 import { Categoria } from 'src/app/Models/Categoria';
+import { AlertasService } from 'src/app/service/alertas.service';
 import { Produto } from 'src/app/Models/Produto';
 import { BrechoService } from 'src/app/service/brecho.service';
 import { CategoriaService } from 'src/app/service/categoria.service';
@@ -28,16 +29,23 @@ export class TelaAdminComponent implements OnInit {
   listaProdutos:Produto[]
   idBrecho:number
   idCategoria:number
+  idCategoria2:number
   brechoProduto:Brecho = new Brecho
   categoriaProduto:Categoria = new Categoria
+  categoriaProduto2: Categoria = new Categoria
   idListaBrecho:number
+  produtoModal= new Produto
+  disponibilidadevar:string
 
+  paginaAtual:number=1
+  paginaAtualProdutos:number=1
   constructor(
     private brechoService: BrechoService,
     private categoriaService: CategoriaService,
-    private produtoService: ProdutoService,
-    private router: Router
-  ) { }
+    private router: Router,
+    private alertas: AlertasService,
+    private produtoService: ProdutoService
+  ) {}
 
   ngOnInit() {
     this.verificaUser()
@@ -45,12 +53,13 @@ export class TelaAdminComponent implements OnInit {
 
   verificaUser(){
     if(environment.token==''){
-      alert('AVISO: VOCÊ NÃO ESTA LOGADO, POR GENTILEZA LOGUE COMO ADM PARA TER ACESSO Á ESTE SERVIÇO')
       this.router.navigate(['/home'])
+       this.alertas.showAlertInfo('AVISO: VOCÊ NÃO ESTA LOGADO, POR GENTILEZA LOGUE COMO ADM PARA TER ACESSO Á ESTE SERVIÇO')
+
     }
     else if(environment.tipo != 'adm'){
-      alert('AVISO: VOCÊ NÃO É UM ADM, POR GENTILEZA LOGUE COMO ADM PARA TER ACESSO Á ESTE SERVIÇO')
       this.router.navigate(['/home'])
+       this.alertas.showAlertInfo('AVISO: VOCÊ NÃO É UM ADM, POR GENTILEZA LOGUE COMO ADM PARA TER ACESSO Á ESTE SERVIÇO')
     }
     else{
       this.getAllBrechos()
@@ -81,17 +90,17 @@ export class TelaAdminComponent implements OnInit {
   cadastrarBrecho(){
     this.brechoService.post(this.brecho).subscribe((resp: Brecho)=>{
       this.brecho = resp
-      alert('Parceiro Cadastrado com sucesso')
+      this.alertas.showAlertSuccess('Parceiro Cadastrado com sucesso')
       this.brecho=new Brecho
       this.getAllBrechos()
     }, erro => {
-      alert("Preencha os campos do parceiro corretamente!")
+      this.alertas.showAlertDanger("Preencha os campos do parceiro corretamente!")
     })
   }
   atualizarBrecho(){
     this.brechoService.put(this.brechoModal).subscribe((resp: Brecho)=>{
       this.brechoModal = resp
-      alert('Parceiro Atualizado com sucesso')
+      this.alertas.showAlertSuccess('Parceiro Atualizado com sucesso')
       this.brechoModal = <Brecho> ({
         id:0,
         nome:'',
@@ -102,14 +111,14 @@ export class TelaAdminComponent implements OnInit {
 
       this.getAllBrechos()
     }, erro => {
-      alert("Preencha os campos do parceiro corretamente!")
+      this.alertas.showAlertDanger("Preencha os campos do parceiro corretamente!")
     })
   }
   deletarBrecho(){
 
     this.brechoService.deleteBrecho(this.brechoModal.id).subscribe(()=>{
 
-      alert('Parceiro apagado com sucesso')
+      this.alertas.showAlertSuccess('Parceiro apagado com sucesso')
 
       this.brechoModal = <Brecho> ({
         id:0,
@@ -139,7 +148,7 @@ export class TelaAdminComponent implements OnInit {
   cadastrarCategoria(){
     this.categoriaService.postCategoria(this.categoria).subscribe((resp:Categoria)=>{
         this.categoria=resp
-        alert("Categoria Cadastrada com sucesso")
+        this.alertas.showAlertSuccess("Categoria Cadastrada com sucesso")
         this.categoria=new Categoria
         this.getAllCategorias()
     }, erro => {
@@ -149,7 +158,7 @@ export class TelaAdminComponent implements OnInit {
   atualizarCategoria(){
     this.categoriaService.putCategoria(this.categoriaModal).subscribe((resp: Categoria)=>{
       this.categoriaModal = resp
-      alert('Categoria Atualizada com sucesso')
+      this.alertas.showAlertSuccess('Categoria Atualizada com sucesso')
       this.categoriaModal = <Categoria> ({
         id:0,
         nome:''
@@ -166,7 +175,7 @@ export class TelaAdminComponent implements OnInit {
   deletarCategoria(){
     this.categoriaService.deleteCategoria(this.categoriaModal.id).subscribe(()=>{
 
-      alert('Categoria apagada com sucesso')
+      this.alertas.showAlertSuccess('Categoria apagada com sucesso')
       this.categoriaModal = <Categoria> ({
         id:0,
         nome:''
@@ -176,33 +185,66 @@ export class TelaAdminComponent implements OnInit {
   }
 
 // CRUD PRODUTOS
-findByIdBrecho(){
-  this.brechoService.getById(this.idBrecho).subscribe((resp: Brecho) => {
-    this.brechoProduto = resp
-  })
-}
-findByIdCategoria(){
-  this.categoriaService.getById(this.idCategoria).subscribe((resp: Categoria)=>{
-    this.categoriaProduto = resp
-  })
-}
+  findByIdBrecho(){
+    this.brechoService.getById(this.idBrecho).subscribe((resp: Brecho) => {
+      this.brechoProduto = resp
+    })
+  }
+  findByIdCategoria(){
+    this.categoriaService.getById(this.idCategoria).subscribe((resp: Categoria)=>{
+      this.categoriaProduto = resp
+    })
+  }
+  findByIdCategoria2(){
+    this.categoriaService.getById(this.idCategoria2).subscribe((resp: Categoria)=>{
+      this.categoriaProduto2 = resp
+    })
+  }
+  cadastrarProduto(){
+    this.produto.brecho = this.brechoProduto
+    this.produto.categoria = this.categoriaProduto
+    this.disponibilidade()
 
-cadastrarProduto(){
-  this.produto.brecho = this.brechoProduto
-  this.produto.tamanho = "p"
-  this.produto.categoria = this.categoriaProduto
+    this.produtoService.postProduto(this.produto).subscribe(()=>{
+      this.alertas.showAlertSuccess('Produto cadastrado com sucesso!');
+      this.produto = new Produto()
+      this.listaProdutosBrecho()
+    })
+  }
 
-  this.produtoService.postProduto(this.produto).subscribe((resp:Produto)=>{
-    alert('Produto cadastrado com sucesso');
-    this.produto = new Produto()
-  })
-}
+  atualizarProduto() {
+    this.produtoModal.categoria = this.categoriaProduto2
+    this.produtoService.putProduto(this.produtoModal).subscribe(() => {
+      this.alertas.showAlertSuccess("Produto atualizado com sucesso!")
+      this.produtoModal = new Produto()
+      this.listaProdutosBrecho()
+    })
+  }
 
-listaProdutosBrecho(){
-  this.produtoService.getByIdBrechoProdutos( this.idListaBrecho).subscribe((resp:Produto[])=>{
-    this.listaProdutos=resp
-  })
-}
+  deletarProduto() {
+    this.produtoService.deleteProduto(this.produtoModal.id).subscribe(() => {
+      this.alertas.showAlertSuccess("Produto deletado com sucesso!")
+      this.produtoModal = new Produto()
+      this.listaProdutosBrecho()
+    })
+  }
+
+  listaProdutosBrecho(){
+    this.produtoService.getByIdBrechoProdutos(this.idListaBrecho).subscribe((resp:Produto[])=>{
+      this.listaProdutos=resp
+    })
+    this.paginaAtual=1
+  }
+  setProdutoModal(id:number){
+    this.produtoService.getByIdProduto(id).subscribe((resp:Produto)=>{
+      this.produtoModal=resp
+    })
+  }
+  disponibilidade(){
+    this.produto.disponivel = this.disponibilidadevar == "true" ? true : false
+  }
+
+
 
 
 

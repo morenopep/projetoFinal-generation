@@ -4,6 +4,7 @@ import { ActivatedRoute, NavigationEnd, ResolveEnd, Router, RoutesRecognized } f
 import { Brecho } from 'src/app/Models/Brecho';
 import { Categoria } from 'src/app/Models/Categoria';
 import { Produto } from 'src/app/Models/Produto';
+import { AlertasService } from 'src/app/service/alertas.service';
 import { CarrinhoService } from 'src/app/service/carrinho.service';
 import { CategoriaService } from 'src/app/service/categoria.service';
 import { ProdutoService } from 'src/app/service/produto.service';
@@ -25,11 +26,18 @@ export class ListaProdutosGeralComponent implements OnInit {
   listaCategoria: Categoria[]
   produtoModal: Produto
 
+  key = "disponivel"
+  reverse = true
+
+
+  paginaAtual:number=1
+
   constructor(
     private categoriaService: CategoriaService,
     private produtoService: ProdutoService,
     private carrinhoService: CarrinhoService,
     private route: ActivatedRoute,
+    private alertas: AlertasService,
     private router: Router
   ) {
 
@@ -43,13 +51,14 @@ export class ListaProdutosGeralComponent implements OnInit {
 
         this.setNomeCategoriaAtual(this.idFiltro)
         this.setListaProduto(this.idFiltro, this.stringPesquisa)
+        this.paginaAtual=1
       }
 
     })
 
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     window.scroll(0, 0)
 
     this.idFiltro = 0
@@ -64,7 +73,6 @@ export class ListaProdutosGeralComponent implements OnInit {
       brecho: new Brecho()
     })
     this.setListaCategoria()
-    
   }
 
   setListaProduto(id: number, s: string) {
@@ -103,10 +111,8 @@ export class ListaProdutosGeralComponent implements OnInit {
     })
   }
 
-
   addToCarrinho(produto: Produto) {
     this.carrinhoService.addToCarrinho(produto)
-    alert("Item adicionado com sucesso")
   }
 
   setNomeCategoriaAtual(id: number) {
@@ -119,6 +125,13 @@ export class ListaProdutosGeralComponent implements OnInit {
     }
 
     this.nomeCategoriaAtual = this.nomeCategoriaAtual == undefined ? "Erro 404" : this.nomeCategoriaAtual
+  }
+
+  deslocamento(){
+    window.scroll({
+      top: 300,
+      behavior: 'smooth'
+    })
   }
 
 }

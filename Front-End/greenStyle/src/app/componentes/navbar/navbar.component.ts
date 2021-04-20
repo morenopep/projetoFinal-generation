@@ -4,7 +4,9 @@ import { Router } from '@angular/router';
 import { Usuario } from 'src/app/Models/Usuario';
 
 import { UsuarioLogin } from 'src/app/Models/UsuarioLogin';
+import { AlertasService } from 'src/app/service/alertas.service';
 import { AuthService } from 'src/app/service/auth.service';
+import { CarrinhoService } from 'src/app/service/carrinho.service';
 import { environment } from 'src/environments/environment.prod';
 
 
@@ -15,6 +17,7 @@ import { environment } from 'src/environments/environment.prod';
 })
 export class NavbarComponent implements OnInit {
 
+  tamanhoCarrinho: number = 0
 
   textoPesquisa: string
 
@@ -22,12 +25,18 @@ export class NavbarComponent implements OnInit {
   nome:string
   tipo:string = environment.tipo
 
-  constructor( private auth: AuthService, private router: Router) { }
+  constructor( 
+    private auth: AuthService, 
+    private router: Router,
+    private alertas: AlertasService,
+    private carrinhoService: CarrinhoService
+    ) { }
 
   ngOnInit() {
     window.scroll(0,0)
     this.logado()
-
+    this.adm()
+    this.carrinhoService.currentMessage.subscribe(tamanho => this.tamanhoCarrinho = tamanho)
   }
 
   logado(){
@@ -44,6 +53,15 @@ export class NavbarComponent implements OnInit {
 
   }
 
+  adm(){
+    if(environment.tipo=="adm"){
+      return true
+    }
+    else{
+      return false
+    }
+  }
+
   entrar(){
 
     this.auth.entrar(this.usuarioLogin).subscribe((resp: UsuarioLogin) => {
@@ -55,14 +73,31 @@ export class NavbarComponent implements OnInit {
       environment.email = this.usuarioLogin.email
       environment.tipo = this.usuarioLogin.tipo
 
+      this.alertas.showAlertInfo("Logado com sucesso!")
+      if(this.router.url.includes("cadastrar")) {
+        this.router.navigate(["/home"])
+      }
     }, erro => {
       if(erro.status == 500){
-        alert("Usuário ou senha estão incorretos")
+        this.alertas.showAlertDanger("Usuário ou senha estão incorretos")
       }
     })
   }
 
-pesquisarProduto(s: string) {
+  sair(){
+      environment.id=0
+      environment.email=''
+      environment.nome=''
+      environment.tipo=''
+      environment.token=''
+
+      this.usuarioLogin = new UsuarioLogin()
+      this.router.navigate(['/home'])
+      this.alertas.showAlertInfo("Deslogado com sucesso!")
+      this.logado()
+  }
+
+  pesquisarProduto(s: string) {
     this.router.navigate([`/produtos-geral/filtro/0/search/${s}`])
   }
 

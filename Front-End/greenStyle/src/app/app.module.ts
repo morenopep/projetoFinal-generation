@@ -2,15 +2,12 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-<<<<<<< HEAD
-
-=======
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
->>>>>>> 1b0ad901300170ba2cc55b7675bac5c8f4a04eee
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { OrderModule } from 'ngx-order-pipe'
 
 import { HashLocationStrategy, LocationStrategy } from "@angular/common";
-
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './componentes/navbar/navbar.component';
@@ -23,6 +20,8 @@ import { SobreNosComponent } from './componentes/sobre-nos/sobre-nos.component';
 import { CarrinhoComponent } from './componentes/carrinho/carrinho.component';
 import { CadastrarComponent } from './componentes/cadastrar/cadastrar.component';
 import { TelaAdminComponent } from './componentes/tela-admin/tela-admin.component';
+import { AlertasComponent } from './componentes/alertas/alertas.component';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 
 @NgModule({
@@ -37,14 +36,18 @@ import { TelaAdminComponent } from './componentes/tela-admin/tela-admin.componen
     SobreNosComponent,
     CarrinhoComponent,
     CadastrarComponent,
-    TelaAdminComponent
+    TelaAdminComponent,
+    AlertasComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FontAwesomeModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    OrderModule,
+    NgxPaginationModule,
+    ModalModule.forRoot()
   ],
 
   providers: [{
